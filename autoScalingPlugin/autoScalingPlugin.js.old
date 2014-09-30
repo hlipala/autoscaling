@@ -1,0 +1,124 @@
+(function (cloudStack) {
+	cloudStack.plugins.autoScalingPlugin = function(plugin) {
+		
+		var autoscale_ip = '10.1.8.24';
+		var autoscale_port = '8080';
+		
+		plugin.ui.addSection({
+			id: 'autoScalingPlugin',
+			title: 'AutoScaling',
+			preFilter: function(args) {
+				return isAdmin();
+			},
+			listView: {
+				id: 'autoScalingPluginInstances',
+				fields: {
+					name: { label: 'label.name' },
+					publicip: { label: 'label.public.ip' },
+					publicport: { label: 'label.public.port' },
+					privateport: { label: 'label.private.port' },
+					state: {
+	                    label: 'State',
+	                    indicator: {
+	                        'Active': 'on',
+	                        'Add': 'off'
+	                    },
+	                    converter: function(data) {
+                            return data == 'Active' ? _l('Enabled') : _l('Disabled');
+                        }
+                    }/*,
+                    tags: {
+	                    label: 'Action',
+	                    converter: function(data) {
+                            //return _l('Disabled');
+	                    	return '<a href="http://www.google.com">'+data+'</a>';
+                        }
+                    }*/
+				},/*
+				actions: {
+					save: {
+						label: 'Create auto scaling policy',
+						messages: {
+							confirm: function() { return 'Are you sure you want create AutoScaling for this LB?' },
+							notification: function() { return 'AutoScaling created' }
+						},
+						action: cloudStack.uiCustom.autoscaler(cloudStack.autoscaler),
+						
+						// Because rebootVirtualMachine is an async job, we need to add a poll function, which will
+						// perodically check the management server to see if the job is ready (via pollAsyncJobResult API call)
+						//
+						// The plugin API provides a helper function, 'plugin.ui.pollAsyncJob' which will work for most jobs
+						// in CloudStack
+						notification: {
+							poll: plugin.ui.pollAsyncJob
+						}
+					},
+					remove: {
+						label: 'Remove auto scaling policy',
+						messages: {
+							confirm: function() { return 'Are you sure you want remove AutoScaling for this LB?' },
+							notification: function() { return 'AutoScaling removed' }
+						},
+						action: function(args) {
+							// Get the instance object of the selected row from context
+							//
+							// -- all currently loaded state is stored in 'context' as objects,
+							//    such as the selected list view row, the selected section, and active user
+							//
+							// -- for list view actions, the object's key will be the same as listView.id, specified above;
+							//    always make sure you specify an 'id' for the listView, or else it will be 'undefined!'
+							//var network = args.context.autoScalingPluginInstances[0];
+ 
+							/*plugin.ui.apiCall('rebootVirtualMachine', {
+								// These will be appended to the API request
+								//
+								// i.e., rebootVirtualMachine&id=...
+								data: {
+									id: network.id
+								},
+								success: function(json) {
+									args.response.success({
+										// This is an async job, so success here only indicates that the job was initiated.
+										//
+										// To pass the job ID to the notification UI (for checking to see when action is completed),
+										// '_custom: { jobID: ... }' needs to always be passed on success, in the same format as below
+										_custom: { jobId: json.rebootvirtualmachineresponse.jobid }
+									});
+								},
+								error: function(errorMessage) {
+									args.response.error(errorMessage); // Cancel action, show error message returned
+								}
+							});*/
+						/*},
+						
+						// Because rebootVirtualMachine is an async job, we need to add a poll function, which will
+						// perodically check the management server to see if the job is ready (via pollAsyncJobResult API call)
+						//
+						// The plugin API provides a helper function, 'plugin.ui.pollAsyncJob' which will work for most jobs
+						// in CloudStack
+						notification: {
+							poll: plugin.ui.pollAsyncJob
+						}
+					},
+				},*/
+				dataProvider: function(args) {
+					$.ajax({
+					   type: 'GET',
+					    url: 'http://'+autoscale_ip+':'+autoscale_port+'/listLoadBalancer?callback=?',
+					    async: false,
+					    jsonpCallback: 'jsonCallback',
+					    contentType: "application/json",
+					    dataType: 'jsonp',
+					    success: function(json) {
+					    	var lbs = json.listloadbalancerrulesresponse.loadbalancerrule;
+							args.response.success({ data: lbs });
+					    },
+					    error: function(e) {
+					    	args.respons.error('Could not load data from AutoScale API')
+					    }
+					});
+				}
+			}
+		});
+	};
+}(cloudStack));
