@@ -109,7 +109,7 @@ public class AutoScaler {
 			
 			log.info("Actual Running: "+instances.size()+", Up-Queued: "+cloud.countOfScaleUpScheduledInstances()+", Down-Queued: "+cloud.countOfScaleDownScheduledInstances()+", MinVM: "+minVM+", MaxVM: "+maxVM);
 			if(runningInstances+cloud.countOfScaleUpScheduledInstances() < minVM ) {
-				//TODO: remove downscale schedule
+				
 				int addInstances = Integer.parseInt(policy[3]) - runningInstances;
 				log.info("Missing Instances: "+addInstances);
 				for(int i=0; i<addInstances; i++) {
@@ -117,7 +117,7 @@ public class AutoScaler {
 				}
 			}
 			else if(runningInstances > maxVM ) {
-				//TODO: remove upscale schedule
+				
 				int removeInstances = instances.size() - maxVM;
 				log.info("Remove instances:" +removeInstances);
 				for(int i=0; i<removeInstances; i++) {
@@ -131,16 +131,16 @@ public class AutoScaler {
 					averageCpuUsage += instances.get(instance);
 				}
 				
-				//averageCpuUsage = averageCpuUsage/instances.size();
+				averageCpuUsage = averageCpuUsage/instances.size();
 				
 				if(averageCpuUsage > Float.parseFloat(policy[5])) {
 					
-					/*
+					
 					if(averageCpuUsage < Float.parseFloat(policy[5]) && scaleUpCounter.containsKey(policy[0])) {
 						// Usage is smaller then autoScalePolicy -> remove from watch list
 						scaleUpCounter.remove(policy[0]);
 					}
-					*/
+					
 					
 					//start counting time (or check if one exist already)
 					if(scaleUpCounter.containsKey(policy[0])) {
@@ -166,11 +166,11 @@ public class AutoScaler {
 				}
 				else if(averageCpuUsage < Float.parseFloat(policy[8])) {
 
-					/*
+					
 					if(averageCpuUsage > Float.parseFloat(policy[8]) && scaleDownCounter.containsKey(policy[0])) {
 						// Usage is bigger then autoScalePolicy -> remove from watch list
 						scaleDownCounter.remove(policy[0]);
-					}*/
+					}
 					
 					log.info("CPU-Usage is low. DownScale-Policy activated.");
 					
