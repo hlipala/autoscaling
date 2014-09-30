@@ -27,9 +27,6 @@ public class AutoScaler {
 	
 	private Timer timer = null;
 	
-	// Settings
-	//private static int scaleDownDelay = 15;
-	
 	
 	public AutoScaler() {
 		this.cloud = CloudStackClient.getInstance();
