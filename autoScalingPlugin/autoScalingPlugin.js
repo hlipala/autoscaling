@@ -1,8 +1,8 @@
 (function (cloudStack) {
 	cloudStack.plugins.autoScalingPlugin = function(plugin) {
 	
-	var autoscale_ip = '141.19.142.25';
-	var autoscale_port = '8082';
+	var autoscale_ip = 'IP';
+	var autoscale_port = 'PORT';
 	
 	plugin.ui.addSection({
 		id: 'autoScalingPlugin',
